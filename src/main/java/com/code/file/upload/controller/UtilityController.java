@@ -1,17 +1,20 @@
 package com.code.file.upload.controller;
 
+import com.code.file.upload.entity.FileUploadHeaderTemplate;
 import com.code.file.upload.service.UtilityService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/utility")
 public class UtilityController {
-
-    private static final Log logger = LogFactory.getLog(UtilityController.class);
 
     private UtilityService utilityService;
 
@@ -21,10 +24,16 @@ public class UtilityController {
 
     @PostMapping("/asciiNoToCharacterStringConversion")
     public String asciiNoToCharacterStringConversion(@RequestBody List<Integer> integerList){
-        logger.info("---::asciiNoToCharacterStringConversion called");
+        log.info("---::asciiNoToCharacterStringConversion called");
         String createdString = utilityService.integerListToCharacterStringConversion(integerList);
-        logger.info("createdString---::"+createdString);
+        log.info("createdString---::"+createdString);
         return createdString;
+    }
+
+    @GetMapping("/hello")
+    public ResponseEntity<String> getTemplateHeaders() {
+        log.info("---::getTemplateHeaders called----");
+        return new ResponseEntity<>("Hello World UtilityController!!", HttpStatus.OK);
     }
 
 }
