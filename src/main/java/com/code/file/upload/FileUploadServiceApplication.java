@@ -1,5 +1,6 @@
 package com.code.file.upload;
 
+import com.code.file.upload.service.UtilityService;
 import com.code.file.upload.utility.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -8,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Arrays;
+import java.util.List;
 
 @SpringBootApplication
 public class FileUploadServiceApplication {
@@ -42,7 +44,10 @@ public class FileUploadServiceApplication {
 	}
 
 	@Bean
-	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+	public CommandLineRunner commandLineRunner(ApplicationContext ctx,
+											   RandomUpperCaseAlphabetStringGenerator randomUpperCaseAlphabetStringGenerator,
+
+											   UtilityService utilityService) {
 		return args -> {
 
 			System.out.println("Let's inspect the beans provided by Spring Boot:");
@@ -52,6 +57,9 @@ public class FileUploadServiceApplication {
 			for (String beanName : beanNames) {
 				System.out.println(beanName);
 			}
+			List<Integer> intList = List.of(65,66,70,97,98,101,123,76);
+			String charString = utilityService.integerListToCharacterStringConversion(intList);
+			System.out.println("charString ::"+charString);
 		};
 	}
 

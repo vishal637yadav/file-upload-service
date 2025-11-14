@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository;
 public interface FileUploadHeaderTemplateRepository extends JpaRepository<FileUploadHeaderTemplate, Long> {
 
 
+    FileUploadHeaderTemplate findByTemplateCode(String templateCode);
+
+    void deleteByTemplateCode(String templateCode);
+
 }
