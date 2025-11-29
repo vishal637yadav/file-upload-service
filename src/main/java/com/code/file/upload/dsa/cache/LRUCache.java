@@ -11,9 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 public class LRUCache<K, V> implements LRU<K, V> {
-
     private static final int DEFAULT_CACHE_SIZE = 4;
 
+    //Inner Class --> Node
     private static class Node<K, V> {
         K key;
         V value;
@@ -29,6 +29,18 @@ public class LRUCache<K, V> implements LRU<K, V> {
         public String toString() {
             return "Node(" + key + ", " + value + ", Prev-" + (prev != null ? prev.key : null) + ", Next-" + (next != null ? next.key : null) + ")";
         }
+    }
+
+    private Node<K, V> head;
+    private Node<K, V> tail;
+    private final Map<K, Node<K, V>> nodeMap;
+    @Getter
+    @Setter
+    private int cacheSize;
+
+    public LRUCache() {
+        cacheSize = DEFAULT_CACHE_SIZE;
+        nodeMap = new ConcurrentHashMap<>();
     }
 
     private void addToFront(K key, V value) {
@@ -89,20 +101,6 @@ public class LRUCache<K, V> implements LRU<K, V> {
         return head;
     }
 
-    private Node<K, V> head;
-    private Node<K, V> tail;
-    private final Map<K, Node<K, V>> nodeMap;
-
-    @Getter
-    @Setter
-    private int cacheSize;
-
-    public LRUCache() {
-        cacheSize = DEFAULT_CACHE_SIZE;
-        nodeMap = new ConcurrentHashMap<>();
-    }
-
-
     @Override
     public void writeToCache(K key, V value) {
         if (key == null) {
@@ -158,6 +156,5 @@ public class LRUCache<K, V> implements LRU<K, V> {
 
         return sb.toString();
     }
-
 
 }
