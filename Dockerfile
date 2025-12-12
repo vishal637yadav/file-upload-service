@@ -1,19 +1,41 @@
-#FROM registry.access.redhat.com/ubi8/openjdk-17:latest
-#ADD target/file-upload-service-0.0.1-SNAPSHOT.jar file-upload-service-0.0.1-SNAPSHOT.jar
-#ENTRYPOINT ["sh", "-c", "java -jar /file-upload-service-0.0.1-SNAPSHOT.jar"]
+FROM eclipse-temurin:17-jdk AS builder
 
-# Build stage
-FROM maven:3.9-eclipse-temurin-17 AS build
-WORKDIR /file-upload-service
+WORKDIR /workspace/app
+
+# Copy Maven files
+COPY mvnw .
+COPY .mvn .mvn
 COPY pom.xml .
-COPY src ./src
-RUN mvn -DskipTests package
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source and build
+COPY src src
+RUN ./mvnw clean package -DskipTests
 
 # Runtime stage
-FROM registry.access.redhat.com/ubi8/openjdk-17:latest
-#FROM eclipse-temurin:17-jre
-WORKDIR /file-upload-service
-COPY --from=build /file-upload-service/target/*.jar file-upload-service-0.0.1-SNAPSHOT.jar
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","file-upload-service-0.0.1-SNAPSHOT.jar"]
+FROM eclipse-temurin:17-jre-jammy
 
+# Create non-root user
+RUN addgroup --system appuser && adduser --system --ingroup appuser appuser
+USER appuser
+
+WORKDIR /app
+
+# Copy the built JAR file
+COPY --from=builder --chown=appuser:appuser /workspace/app/target/*.jar app.jar
+
+# Environment variables
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom \
+               -XX:+UseContainerSupport \
+               -XX:MaxRAMPercentage=75.0"
+
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+# Run the fat JAR (Spring Boot handles classpath automatically)
+ENTRYPOINT ["java", "-jar", "app.jar"]
