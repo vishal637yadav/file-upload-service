@@ -36,4 +36,9 @@ public class UtilityController {
         return new ResponseEntity<>("Hello World UtilityController!!", HttpStatus.OK);
     }
 
+    @GetMapping("/welcome/{name}")
+    public ResponseEntity<String> welcome(@PathVariable String name) {
+        log.info("---::getTemplateHeaders called----");
+        return new ResponseEntity<>("Hi "+name+", Welcome the the UtilityController!!", HttpStatus.OK);
+    }
 }
